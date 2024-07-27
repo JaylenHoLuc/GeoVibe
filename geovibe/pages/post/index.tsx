@@ -8,12 +8,11 @@ import Navbar from "@/navbar_components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function Post() {
 
-  const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
   return (
     <>
-        <EsriMap/>
+    <h1>Post Page</h1>
     </>
   );
 }
