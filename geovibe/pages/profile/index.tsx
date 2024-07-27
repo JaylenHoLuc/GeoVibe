@@ -6,13 +6,41 @@ import RenderMap from "@/map_components/RenderMap";
 import dynamic from "next/dynamic";
 import Navbar from "@/navbar_components/navbar";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Profile() {
+  const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
 
   return (
     <>
-    <h1>Profile Page</h1>
+      <div className="card bg-base-100 w-full">
+        <div className="card-body h-full w-full">
+          <div className="grid grid-cols-4 h-full w-full gap-3">
+            <div className="col-span-4 place-self-center">
+              <div className="avatar">
+                <div className="w-64 rounded-full">
+                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                </div>
+              </div>
+            </div>
+            <div className="col-span-2 justify-self-end mx-3">
+              <h1 className="text-3xl">
+                Sartaj Dua
+              </h1>
+              <h1 className="text-1xl">
+                @sartajdua7
+              </h1>
+            </div>
+            <div className="stats shadow col-span-2 justify-self-start mx-3">
+              <div className="stat">
+                <div className="stat-title">Friends</div>
+                <div className="stat-value">300</div>
+              </div>
+            </div>
+            <div className="col-span-4">
+              <EsriMap />
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
