@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import Layout from '../components/layout'
 import '@/styles/globals.css'
 import Head from "next/head";
 import Navbar from '@/navbar_components/navbar';
 export default function MyApp({ Component, pageProps }) {
+=======
+//import Layout from '../components/layout'
+import '@/styles/globals.css'
+import Head from "next/head";
+import Navbar from '@/navbar_components/navbar';
+export default function MyApp({ Component, pageProps } : any) {
+>>>>>>> eac58be11de09cbb8d735cc04e0478d9bc790ad0
   return (
     <>
       <Head>
