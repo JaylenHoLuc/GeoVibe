@@ -8,12 +8,12 @@ import Navbar from "@/navbar_components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-
-  const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
-  return (
-    <>
-        <EsriMap/>
-    </>
-  );
+export default function Guess() {
+    const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+    return (
+        <>
+            <h1>Guess Page</h1>
+            <EsriMap />
+        </>
+    );
 }
