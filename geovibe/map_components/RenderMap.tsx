@@ -18,7 +18,7 @@ const RenderMap = ({start_x, start_y} :{start_x : number, start_y : number}) => 
     
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
     let graphicsLayer : GraphicsLayer | null = null;
-    
+    const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
     
     const addPoint = (view :  MapView | null , x : number, y : number) => {
        
@@ -40,33 +40,28 @@ const RenderMap = ({start_x, start_y} :{start_x : number, start_y : number}) => 
                 geometry: point,
                 symbol: markerSymbol
             });
-            if (currentPointer && graphicsLayer){
+            if (currentPointer && graphicsLayerRef.current){
                 // const graphicToRemove = graphicsLayer.graphics.find(
                 //     (graphic) => graphic.attributes.id === "point-id"
                 //   );
-                const graphics = graphicsLayer.graphics;
+                const graphics = graphicsLayerRef.current.graphics;
                 if (graphics.length > 0) {
-                  graphicsLayer.remove(graphics.getItemAt(graphics.length - 1));
+                    graphicsLayerRef.current.remove(graphics.getItemAt(graphics.length - 1));
                 }
             }
 
+            // if (currentPointer && graphicsLayerRef.current) {
+            //     graphicsLayerRef.current.remove(currentPointer);
+            //   }
+
+            graphicsLayerRef.current!.add(pointGraphic);
             setPointer(pointGraphic);
-            graphicsLayer!.add(pointGraphic);
 
             //movePoint(view, x , y);
             // view!.graphics.add(currentPointer);
           
         
        
-    }
-    const movePoint = (view :  MapView | null, x : number , y : number) => {
-        if (currentPointer && view) {
-            currentPointer.setAttribute("longitude", y);
-            currentPointer.setAttribute("latitude", x)
-            const temp = currentPointer;
-            setPointer(temp);
-            console.log("removed")
-        }
     }
 
     const mapRef = useRef(null);
@@ -97,7 +92,11 @@ const RenderMap = ({start_x, start_y} :{start_x : number, start_y : number}) => 
             })
 
             graphicsLayer = new GraphicsLayer();
+            graphicsLayerRef.current = graphicsLayer;
             map.add(graphicsLayer);
+
+
+
             view.ui.add(expand, "top-right")
             view.on("click", function(event) {
                 // Get the coordinates of the clicked point
