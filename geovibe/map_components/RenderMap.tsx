@@ -1,5 +1,4 @@
 'use client';
-import config from '@arcgis/core/config'
 import ArcGISMap from '@arcgis/core/Map'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
 import MapView from '@arcgis/core/views/MapView'
