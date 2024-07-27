@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@arcgis/core": "^4.30.9",
+    "arcgis-js-api": "^4.30.9",
+    "next": "^14.2.5"
+  }
+}
