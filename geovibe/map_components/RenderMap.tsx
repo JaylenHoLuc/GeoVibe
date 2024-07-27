@@ -7,12 +7,13 @@ import { watch } from '@arcgis/core/core/reactiveUtils'
 import Map from '@arcgis/core/Map';
 import Expand from '@arcgis/core/widgets/Expand'
 import { useEffect, useRef } from 'react'
+import PostForm from './PostForm';
 const RenderMap = () => {
 
     const mapRef = useRef(null);
 
     useEffect(() => {
-      let view: { destroy: () => void; } | null;
+      let view : MapView | null;
       (async () => {
 
         const map = new Map({
@@ -25,6 +26,13 @@ const RenderMap = () => {
           center: [-118.80500, 34.02700],
           zoom: 3
         });
+        const postWidget =  document.getElementById("post-wrap")!;
+        const expand = new Expand({
+            content: postWidget,
+            expanded: false
+        })
+        view.ui.add(expand, "top-right")
+    
       })();
   
       return () => {
@@ -35,7 +43,13 @@ const RenderMap = () => {
       };
     }, []);
   
-    return <div ref={mapRef} style={{ width: '100%', height: '400px' }}></div>;
+    return (
+        <>
+            <div ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+            <PostForm/>
+        </>
+
+    );
 }
 
 
