@@ -7,7 +7,7 @@ import { watch } from '@arcgis/core/core/reactiveUtils'
 import Map from '@arcgis/core/Map';
 import Expand from '@arcgis/core/widgets/Expand'
 import { useEffect, useRef } from 'react'
-import PostForm from './PostForm';
+import styles from './styles.module.css'
 const RenderMap = () => {
 
     const mapRef = useRef(null);
@@ -24,7 +24,11 @@ const RenderMap = () => {
           container: mapRef.current!,
           map: map,
           center: [-118.80500, 34.02700],
-          zoom: 3
+          zoom: 3,
+          constraints: {
+            minZoom: 3
+          }
+          
         });
         const postWidget =  document.getElementById("post-wrap")!;
         const expand = new Expand({
@@ -44,10 +48,9 @@ const RenderMap = () => {
     }, []);
   
     return (
-        <>
-            <div ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
-            <PostForm/>
-        </>
+
+        <div ref={mapRef} id={styles.mapContainer} style={{ width: '100%', height: '400px' }}></div>
+
 
     );
 }
