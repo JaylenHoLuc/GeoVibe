@@ -5,10 +5,6 @@ import styles from "@/styles/Home.module.css";
 import RenderMap from "@/map_components/RenderMap";
 import dynamic from "next/dynamic";
 import Navbar from "@/navbar_components/navbar";
-<<<<<<< HEAD
-=======
-import italy_photo from '@/fixtures/italy_photo.jpeg'
->>>>>>> eac58be11de09cbb8d735cc04e0478d9bc790ad0
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,38 +13,8 @@ export default function Guess() {
     const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
     return (
         <>
-<<<<<<< HEAD
             <h1>Guess Page</h1>
             <EsriMap />
-=======
-        <div className="card bg-base-100 w-full">
-            <div className="grid grid-cols-4">
-                <div className="col-span-1 place-items-center card bg-base-100">
-                    <figure className="h-96">
-                        <Image src={italy_photo} alt="Italy"/>
-                    </figure>
-                    <h1 className="text-3xl">
-                        @Jalen
-                    </h1>
-                    <div className="stats shadow">
-                    <div className="stat">
-                        <div className="stat-title">Guesses Remaining</div>
-                        <div className="stat-value place-self-center">3</div>
-                    </div>
-                    </div>
-                    <div className="join mt-3">
-                        <button className="join-item btn btn-outline">Prev</button>
-                        <button className="join-item btn btn-outline">Next</button>
-                    </div>
-                </div>
-                <div className="col-span-3">
-                    <div className="card bg-base-100">
-                        <EsriMap />
-                    </div>
-                </div>
-            </div>
-        </div>
->>>>>>> eac58be11de09cbb8d735cc04e0478d9bc790ad0
         </>
     );
 }

@@ -10,11 +10,7 @@
   },
   "dependencies": {
     "@arcgis/core": "^4.30.9",
-<<<<<<< HEAD
     "@supabase/supabase-js": "^2.44.4",
-=======
-    "install": "^0.13.0",
->>>>>>> eac58be11de09cbb8d735cc04e0478d9bc790ad0
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18"
