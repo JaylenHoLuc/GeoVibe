@@ -36,7 +36,7 @@ export default function Guess() {
                 </div>
                 <div className="col-span-3">
                     <div className="card bg-base-100">
-                        <EsriMap />
+                    <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null}/>
                     </div>
                 </div>
             </div>

@@ -99,8 +99,6 @@ const RenderMap = ({start_x, start_y, point_ref} :{start_x : number, start_y : n
                 graphicsLayerRef.current!.add(point_ref);
                 setPointer(point_ref);
                 
-            }else{
-                console.log("is null")
             }
 
             view.ui.add(expand, "top-right")

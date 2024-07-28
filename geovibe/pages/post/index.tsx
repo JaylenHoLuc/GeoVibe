@@ -121,7 +121,7 @@ export default function Post() {
       // return data["publicUrl"]
 
 
-      const res = await supabase
+    const res = await supabase
           .storage
           .from('user-images')
           .upload('abird/'+ curr_filename, selectedFile!, {
@@ -129,23 +129,21 @@ export default function Post() {
             upsert: false
           })
           
-      // const converted_to_miles = 
-      // console.log("resp: ", res)
-    //  const data =  await supabase.from('Posts').insert({
-    //     created_by : "abird",
-    //     title : "new title",
-    //     description : descr,
-    //     latitude : latitude,
-    //     longitude : longitude,
-    //     pic_uri : "null",
-    //     guesses_max : parseInt(guesses),
-    //     category : currentCategory,
-    //     distance : dist
-    //   })
-    // const data_user =  await supabase.from('Users').insert({
-    //     username : "testnane11",
-    //     name : "haha"
-    // })
+     const data =  await supabase.from('Posts').insert({
+        created_by : "abird",
+        title : "new title",
+        description : descr,
+        latitude : latitude,
+        longitude : longitude,
+        pic_uri : "null",
+        guesses_max : parseInt(guesses),
+        category : currentCategory,
+        distance : dist
+      })
+    const data_user =  await supabase.from('Users').insert({
+        username : "testnane11",
+        name : "haha"
+    })
     console.log("user test: ", res)
 
 
