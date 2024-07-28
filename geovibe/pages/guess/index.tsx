@@ -42,17 +42,30 @@ export default function Guess() {
     }
     const c_x = useRef(0)
     const c_y = useRef(0)
-
+    function pad2(n : number) { return n < 10 ? '0' + n : n }
+    function get_timestamp() {
+        let date = new Date();
+        return (date.getFullYear().toString() + "-" +
+        pad2(date.getMonth() + 1) + "-" +
+        pad2( date.getDate()) + "-" +
+        pad2( date.getHours() ) + ":" +
+        pad2( date.getMinutes() ) + ":" +
+        pad2( date.getSeconds() ));
+      }
     const pushSuccess = async () => {
-        const client = createSupabaseClient();
-        await client
+        //console.log("000000 ",guesses_remaind)
+        const client = await createSupabaseClient();
+
+        const res = await client
             .from("Guesses")
             .insert({
+                guessed_by : "geoviber",
                 created_by : "abird",
-                guesses_remaining : guesses_remaind,
+                guesses_remaining : guesses_remaind.current ,
                 post_id : allPosts![postIndex]['id'],
                 success : true
-              })
+        })
+        console.log("res--> ", res)
 
     }
 
@@ -186,7 +199,7 @@ export default function Guess() {
        //console.log("get uri function : ", getPublicPicUrl(allPosts[postIndex]['pic_uri']));
 
 
-      }, []);
+      }, [allPosts]);
 
     return (
         <>
