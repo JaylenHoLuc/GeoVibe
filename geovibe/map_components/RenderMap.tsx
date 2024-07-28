@@ -24,10 +24,6 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
     const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
     let clickHandler: IHandle | null = null;
 
-    const guessAttempt = () => {
-
-    }
-
 
     const addPoint = (view :  MapView | null , x : number, y : number) => {
        

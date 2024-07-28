@@ -10,7 +10,7 @@ import {getAllPosts} from "@/lib/SupabaseHelper";
 import { useRef, useState } from "react";
 import createSupabaseClient from "@/lib/supabaseclient";
 import { useEffect, useCallback } from 'react';
-
+import {toast} from 'react-toastify';
 const inter = Inter({ subsets: ["latin"] });
 const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
 export default function Guess() {
@@ -43,6 +43,19 @@ export default function Guess() {
     const c_x = useRef(0)
     const c_y = useRef(0)
 
+    const pushSuccess = async () => {
+        const client = createSupabaseClient();
+        await client
+            .from("Guesses")
+            .insert({
+                created_by : "abird",
+                guesses_remaining : guesses_remaind,
+                post_id : allPosts![postIndex]['id'],
+                success : true
+              })
+
+    }
+
     const detColor = useCallback(() => {
         dec();
         console.log("detcolor : ", c_x.current, c_y.current, post_x, post_y)
@@ -56,17 +69,18 @@ export default function Guess() {
             const diff_dist = hav_dist;
             let res = logToRange(diff_dist)
             if (res > 45){
+                pushSuccess();
+                toast.success("You have successfully guessed the location !")
                 //set_dist_val(100)
                 set_current_color("range range-success")
             }else if (30 <  res){
 
-                //set_dist_val(75)
                 set_current_color("range range-info")
             }else if (15 <  res){
-                //set_dist_val(25)
+                
                 set_current_color( "range range-warning")
             }else {
-                //set_dist_val(0)
+                
                 set_current_color( "range range-error")
             }
             console.log("diff dist : ", diff_dist)
