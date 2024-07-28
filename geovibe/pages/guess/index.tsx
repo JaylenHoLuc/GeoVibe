@@ -12,13 +12,15 @@ import createSupabaseClient from "@/lib/supabaseclient";
 import { useEffect, useCallback } from 'react';
 import {toast} from 'react-toastify';
 const inter = Inter({ subsets: ["latin"] });
-const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+let EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+
 export default function Guess() {
 
     const [allPosts,setAllPosts] = useState<any[] | null>(null);
     const [postIndex,setPostIndex] = useState(0);
     const [image,setImage] = useState('');
     const [dist_val, set_dist_val] = useState(0);
+    const [message, setMessage] = useState('Watch the slider track how close you are!');
     
     const [current_guess_dist, setguessdist] = useState(0);
 
@@ -40,6 +42,9 @@ export default function Guess() {
     const set_current_color = (c : string) => {
         current_color.current = c
     }
+    useEffect(() => {
+        EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+    }, [postIndex])
     const c_x = useRef(0)
     const c_y = useRef(0)
     function pad2(n : number) { return n < 10 ? '0' + n : n }
@@ -86,15 +91,19 @@ export default function Guess() {
                 toast.success("You have successfully guessed the location !")
                 //set_dist_val(100)
                 set_current_color("range range-success")
+                setMessage('You got it!');
             }else if (30 <  res){
 
                 set_current_color("range range-info")
+                setMessage("You are so close!")
             }else if (15 <  res){
                 
                 set_current_color( "range range-warning")
+                setMessage("You're getting somewhere...")
             }else {
                 
                 set_current_color( "range range-error")
+                setMessage("Not quite")
             }
             console.log("diff dist : ", diff_dist)
             
@@ -231,14 +240,6 @@ export default function Guess() {
                         </div>
                         </>
                     }
-                    {current_guess_dist && <input value={dist_val} id="slider" type="range" min={0} max="70" className={current_color.current} step="1" />}
-                    <div className="flex w-full justify-between px-2 text-xs">
-                        <span>|</span>
-                        <span>|</span>
-                        <span>|</span>
-                        <span>|</span>
-                        <span>|</span>
-                    </div>
                     {/* <input type="range" min={0} max="100" value={dist_val} className={`range range-${current_color}`} /> */}
                     
                     <div className="join mt-3">
@@ -252,6 +253,11 @@ export default function Guess() {
                         <EsriMap user_x = {update_x} start_x={-118.80500} start_y={34.02700} post_x_coord= {allPosts[postIndex]['longitude']} 
                         post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={guesses_remaind.current? guesses_remaind.current : 3 }/>
                     }
+
+                    <div className='mt-6 mx-6'>
+                    {current_guess_dist && <input value={dist_val} id="slider" type="range" min={0} max="70" className={current_color.current} step="1" />}
+                    <h1 className='justify-self-center text-center text-2xl'>{message}</h1>
+                    </div>
                     </div>
                 </div>
             </div>
