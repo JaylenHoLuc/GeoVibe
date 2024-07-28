@@ -15,12 +15,12 @@ const inter = Inter({ subsets: ["latin"] });
 let EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
 
 export default function Guess() {
-
+    const defaultMessage = 'Watch the slider track how close you are!'
     const [allPosts,setAllPosts] = useState<any[] | null>(null);
     const [postIndex,setPostIndex] = useState(0);
     const [image,setImage] = useState('');
     const [dist_val, set_dist_val] = useState(0);
-    const [message, setMessage] = useState('Watch the slider track how close you are!');
+    const [message, setMessage] = useState(defaultMessage);
     
     const [current_guess_dist, setguessdist] = useState(0);
 
@@ -30,11 +30,11 @@ export default function Guess() {
     // const [c_x, set_cx] = useState(0);
 
     //const [guesses_remaind, set_gr] = useState<number>(0);
-    const guesses_remaind = useRef(0)
+    const [guesses, setGuesses] = useState(0);
     const dec = () => {
-        if (guesses_remaind){
-            console.log("GUESSES : ", guesses_remaind)
-            guesses_remaind.current--;
+        if (guesses){
+            console.log("GUESSES : ", guesses)
+            setGuesses(guesses-1);
         }
     }
     //const [current_color, set_current_color ] = useState("range range-error");
@@ -44,25 +44,36 @@ export default function Guess() {
     }
     useEffect(() => {
         EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+        setMessage(defaultMessage);
+        setguessdist(0)
+        set_dist_val(0)
     }, [postIndex])
+
     const c_x = useRef(0)
     const c_y = useRef(0)
 
     const pushSuccess = async () => {
         const client = createSupabaseClient();
-        await client
+        const res = await client
             .from("Guesses")
-            .insert({
-                created_by : "abird",
-                guesses_remaining : guesses_remaind,
+            .upsert({
+                guessed_by : "abird",
+                created_by : "annam",
+                guesses_remaining : 3 ,
                 post_id : allPosts![postIndex]['id'],
                 success : true
-              })
+        })
+        console.log("result : ",res)
 
     }
 
-    const detColor = useCallback(() => {
-        dec();
+    const detColor = () => {
+        setGuesses(prevGuesses => {
+            if (prevGuesses > 0) {
+                return prevGuesses - 1;
+            }
+            return prevGuesses;
+        });        
         console.log("detcolor : ", c_x.current, c_y.current, post_x, post_y)
         let hav_dist = null;
         if (c_x.current && c_y.current){
@@ -101,7 +112,8 @@ export default function Guess() {
             set_dist_val(0);
             set_current_color("range range-error");
         }
-    },[current_guess_dist, post_x, post_y, dist_val, guesses_remaind])
+    }
+    
     const update_x = useCallback((x : number, y : number) => {
         c_x.current = x
         c_y.current = y
@@ -175,15 +187,18 @@ export default function Guess() {
             setImage(url);
         }
         if(allPosts) {
+            console.log("GUESSES", guesses)
             retrieve();
+            console.log("RESETING GUESSES")
             setguessdist(allPosts[postIndex]['distance']);
             set_x(allPosts[postIndex]['longitude']);
             console.log(post_x)
             set_y(allPosts[postIndex]['latitude']);
             console.log(post_y)
-            guesses_remaind.current = (allPosts![postIndex]['guesses_max'])
+            setGuesses(allPosts![postIndex]['guesses_max'])
+            console.log("GUESSES", guesses)
         }
-    }, [allPosts, postIndex, guesses_remaind])
+    }, [postIndex, allPosts])
 
     useEffect(() => {
         const retrieve = async () => {
@@ -216,7 +231,7 @@ export default function Guess() {
                         <div className="stats shadow">
                         <div className="stat">
                             <div className="stat-title">Guesses Remaining</div>
-                            <div className="stat-value place-self-center">{guesses_remaind.current}</div>
+                            <div className="stat-value place-self-center">{guesses}</div>
                         </div>
                         </div>
                         <div className="stats shadow">
@@ -238,7 +253,7 @@ export default function Guess() {
                     <div className="card bg-base-100">
                     {allPosts &&
                         <EsriMap user_x = {update_x} start_x={-118.80500} start_y={34.02700} post_x_coord= {allPosts[postIndex]['longitude']} 
-                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={guesses_remaind.current? guesses_remaind.current : 3 }/>
+                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={4}/>
                     }
 
                     <div className='mt-6 mx-6'>

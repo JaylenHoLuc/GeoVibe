@@ -92,7 +92,7 @@ export default function Post() {
       { value: 50, label: '50mi' },
       { value: 100, label: '100mi' }
     ];
-    
+    const distRef = useRef(null)
     function get_timestamp() {
 
       return (date.getFullYear().toString() + "-" +
@@ -124,29 +124,26 @@ export default function Post() {
     const res = await supabase
           .storage
           .from('user-images')
-          .upload('abird/'+ curr_filename, selectedFile!, {
+          .upload('annam/'+ curr_filename, selectedFile!, {
             cacheControl: '3600',
             upsert: false
           })
+          console.log(res)
           
+          console.log("DISTANCE", dist)
+
      const data =  await supabase.from('Posts').insert({
-        created_by : "abird",
+        created_by : "annam",
         title : "new title",
         description : descr,
         latitude : latitude,
         longitude : longitude,
-        pic_uri : "null",
+        pic_uri : "annam/" + curr_filename,
         guesses_max : parseInt(guesses),
         category : currentCategory,
         distance : dist
       })
-    const data_user =  await supabase.from('Users').insert({
-        username : "testnane11",
-        name : "haha"
-    })
-    console.log("user test: ", res)
-
-
+      console.log(data);
     }
 
     const saveCategory = (category : string) => {
@@ -179,6 +176,8 @@ export default function Post() {
 
     // // free memory when ever this component is unmounted
     // return () => URL.revokeObjectURL(objectUrl);
+    console.log("lat in post: ",longitude)
+    console.log(latitude)
     const point = new Point({
       longitude: longitude as number,
       latitude: latitude as number
@@ -220,12 +219,13 @@ export default function Post() {
             <div className="label">
               <span className="label-text">How close does the guess need to be</span>
             </div>
-            <select className="select select-bordered ">
+            <select ref={distRef} className="select select-bordered" onClick={(e) => {
+              setdist(e.target.value)
+              console.log(e.target.value)
+            }}>
               {distances.map((distance) => {
                 return (
-                  <option onClick= {(e) => {
-                    setdist(distance.value)}
-                  } key={distance.value} value={distance.value}>{distance.label}</option>
+                  <option key={distance.value} value={distance.value}>{distance.label}</option>
                 )
               })}
             </select>

@@ -95,15 +95,16 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
             graphicsLayer = new GraphicsLayer();
             graphicsLayerRef.current = graphicsLayer;
             map.add(graphicsLayer);
+            if (point_ref != null){
+                console.log("preset point : ",point_ref)
+                graphicsLayerRef.current!.add(point_ref);
+                setPointer(point_ref);
+                
+            }
             console.log("tot guess : ",total_guesses);
             if (guesses_remain != null && guesses_remain > 0 ){
                 console.log("curr guesses : ",guesses_remain)
-                if (point_ref != null){
-                    console.log("preset point : ",point_ref)
-                    graphicsLayerRef.current!.add(point_ref);
-                    setPointer(point_ref);
-                    
-                }
+
 
                 clickHandler = view.on("click", function(event) {
                     // Get the coordinates of the clicked point
