@@ -124,7 +124,7 @@ export default function Post() {
       const res = await supabase
           .storage
           .from('user-images')
-          .upload('abird/'+ curr_filename, curr_filename, {
+          .upload('abird/'+ curr_filename, selectedFile!, {
             cacheControl: '3600',
             upsert: false
           })
