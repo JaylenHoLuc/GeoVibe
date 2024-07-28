@@ -10,21 +10,23 @@ import { Exifr } from "exifr";
 import EXIF from 'exif-js';
 import * as ExifReader from 'exifreader';
 import { Buffer } from 'buffer';
-
+import  createSupabaseClient  from "@/lib/supabaseclient";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Post() {
     const [geolocation, setGeolocation] = useState("");
-    const [longitude, setLongitude] = useState(null)
-    const [latitude, setLatitude] = useState(null)
+    const [longitude, setLongitude] = useState<String | number | null>(null)
+    const [latitude, setLatitude] = useState<String | number | null>(null)
     const [imageUploaded, setimageUploaded] = useState("");
     const [buffer, setBuffer] = useState(null)
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [lat, setLat] = useState(null);
     const [lon, setLon] = useState(null);
-
-    const fetchImageAndConvertToBuffer = async (url) => {
+    const [descr, setDescr] = useState("")
+    const [guesses, setguesses] = useState<string>("")
+    const [dist, setdist] = useState<number>(0);
+    const fetchImageAndConvertToBuffer = async (url : any) => {
       try {
           const response = await fetch(url);
           if (!response.ok) {
@@ -45,18 +47,19 @@ export default function Post() {
         const buffer = await fetchImageAndConvertToBuffer(imageUploaded);
         console.log(buffer);
         const tags = await ExifReader.load(buffer as any);
-        console.log(tags)
-        if(tags['GPSLatitudeRef']['value'][0] === 'S') {
-          setLatitude(-tags['GPSLatitude'].description);
+        const latref = tags['GPSLatitudeRef'] as any
+        if(latref['value'][0] === 'S') {
+          tags['GPSLatitude'] != undefined? setLatitude(-tags['GPSLatitude'].description) : null;
         }
         else {
-          setLatitude(tags['GPSLatitude'].description);
+          tags['GPSLatitude'] != undefined? setLatitude(tags['GPSLatitude'].description) : null;
         }
-        if(tags['GPSLongitudeRef']['value'][0] === 'W') {
-          setLongitude(-tags['GPSLongitude'].description);
+        const longref = tags['GPSLatitudeRef'] as any
+        if(longref['value'][0] === 'W') {
+          tags['GPSLongitude'] != undefined? setLongitude(-tags['GPSLongitude'].description) : null;
         }
         else {
-          setLongitude(tags['GPSLongitude'].description);
+          tags['GPSLongitude'] != undefined? setLongitude(tags['GPSLongitude'].description) : null;
         }
       }
       if (imageUploaded) {
@@ -74,17 +77,17 @@ export default function Post() {
     const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false }); 
     
     const distances = [
-      '50ft',
-      '100ft',
-      '500ft',
-      '1/2mi',
-      '1mi',
-      '5mi',
-      '10mi',
-      '20mi',
-      '50mi',
-      '100mi'
-    ]
+      { value: 0.00947, label: '50ft' },
+      { value: 0.019, label: '100ft' },
+      { value: 0.095, label: '500ft' },
+      { value: 0.5, label: '1/2mi' },
+      { value: 1, label: '1mi' },
+      { value: 5, label: '5mi' },
+      { value: 10, label: '10mi' },
+      { value: 20, label: '20mi' },
+      { value: 50, label: '50mi' },
+      { value: 100, label: '100mi' }
+    ];
     
     function get_timestamp() {
 
@@ -100,6 +103,50 @@ export default function Post() {
     const handleSubmit = () => {
 
     }
+
+    const pushToDatabase = async () => {
+      const supabase = createSupabaseClient();
+      console.log("descr : ", descr);
+      console.log("guesses : ", guesses);
+      const img = fetchImageAndConvertToBuffer(imageUploaded)
+      console.log("file name : ", selectedFile!.name)
+      const curr_filename = selectedFile!.name;
+      // const {data} = supabase.storage.from('user-images').getPublicUrl("abird/AmsAmber.HEIC");
+      // console.log("data: ", data['publicUrl']);
+
+      // return data["publicUrl"]
+
+
+      // const res = await supabase
+      //     .storage
+      //     .from('user-images')
+      //     .upload('abird/'+ curr_filename, curr_filename, {
+      //       cacheControl: '3600',
+      //       upsert: false
+      //     })
+          
+      // const converted_to_miles = 
+      // console.log("resp: ", res)
+    //  const data =  await supabase.from('Posts').insert({
+    //     created_by : "abird",
+    //     title : "new title",
+    //     description : descr,
+    //     latitude : latitude,
+    //     longitude : longitude,
+    //     pic_uri : "null",
+    //     guesses_max : parseInt(guesses),
+    //     category : currentCategory,
+    //     distance : dist
+    //   })
+    // const data =  await supabase.from('Users').insert({
+    //     username : "testnane11",
+    //     name : "haha"
+    // })
+      //console.log("user test: ", res)
+
+
+    }
+
     const saveCategory = (category : string) => {
         setCurrentCategory(category);
 
@@ -107,7 +154,7 @@ export default function Post() {
     
     const mapRef = useRef(null);
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = (e : any) => {
       if (!e.target.files || e.target.files.length === 0) {
         setSelectedFile(null)
         return
@@ -123,7 +170,7 @@ export default function Post() {
     }
 
     const objectUrl = URL.createObjectURL(selectedFile)
-    console.log(objectUrl);
+    console.log("pic url : ",objectUrl);
     setimageUploaded(objectUrl);
 
     // // free memory when ever this component is unmounted
@@ -142,7 +189,7 @@ export default function Post() {
             <div className="label">
               <span className="label-text">Caption</span>
             </div>
-            <textarea className="textarea textarea-bordered" placeholder="Caption"></textarea>
+            <textarea id="post-descr" className="textarea textarea-bordered" placeholder="Caption" onChange={(e) => setDescr(e.target.value)}></textarea>
             <div className="label">
             </div>
           </label>
@@ -153,23 +200,41 @@ export default function Post() {
             <select className="select select-bordered ">
               {distances.map((distance) => {
                 return (
-                  <option key="distance" value={distance}>{distance}</option>
+                  <option onClick= {(e) => {
+                    setdist(distance.value)}
+                  } key={distance.value} value={distance.value}>{distance.label}</option>
                 )
               })}
             </select>
           </label>
+
           <label className="form-control col-span-1">
             <div className="label">
               <span className="label-text"># of Guesses per Hour</span>
             </div>
-            <input type="number" max="10" min="1" step="1" placeholder="Type here" className="input input-bordered max-w-full" />
+            <input onChange = {(e) => {setguesses(e.target.value)}} id="guesses-comp" type="number" max="10" min="1" step="1" placeholder="Type here" className="input input-bordered max-w-full" />
           </label>
+          <div id= "dropdowncat" className="dropdown col-span-2">
+        <div tabIndex={0} role="button" className="btn m-1">{currentCategory}</div>
+        <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+          <li onClick={() => saveCategory("Nature")}><a>Nature</a></li>
+          <li onClick={() => saveCategory("Travel")}><a>Travel</a></li>
+          <li onClick={() => saveCategory("Food")}><a>Food</a></li>
+          <li onClick={() => saveCategory("The Arts")}><a>The Arts</a></li>
+          <li onClick={() => saveCategory("Music")}><a>Music</a></li>
+          <li onClick={() => saveCategory("Event")}><a>Event</a></li>
+          <li onClick={() => saveCategory("Architecture")}><a>Architecture</a></li>
+          <li onClick={() => saveCategory("Sport")}><a>Sport</a></li>
+          <li onClick={() => saveCategory("Other")}><a>Other</a></li>
+        </ul>
+      </div>
+
           {latitude && 
           <label className="form-control col-span-1">
               <div className="label">
                 <span className="label-text">Latitude</span>
               </div>
-              <input value={latitude} disabled type="text" placeholder="Write your title" className="input input-bordered w-full max-w-xs" />
+              <input value={latitude as number} disabled type="text" placeholder="Write your title" className="input input-bordered w-full max-w-xs" />
           </label>
           }
           {longitude && 
@@ -177,13 +242,13 @@ export default function Post() {
               <div className="label">
                 <span className="label-text">Longitude</span>
               </div>
-              <input value={longitude} disabled type="text" placeholder="Write your title" className="input input-bordered w-full max-w-xs" />
+              <input value={longitude as number} disabled type="text" placeholder="Write your title" className="input input-bordered w-full max-w-xs" />
           </label>
           }
           <div className="col-span-2 mt-6 mb-20">
             {
               imageUploaded && longitude && latitude &&
-              <EsriMap start_x={longitude} start_y={latitude}/>
+              <EsriMap start_x={longitude as number} start_y={latitude as number}/>
             }
           </div>
         </div>
@@ -206,11 +271,12 @@ export default function Post() {
           </label>
         </div>
         <div className="col-span-4 w-full mt-6">
-          <button className="btn w-full btn-primary" disabled={!imageUploaded}>
+          <button  onClick={() => pushToDatabase()} className="btn w-full btn-primary" disabled={!imageUploaded}>
             Post
           </button>
         </div>
       </div>
+      
       {/* <div>
         <label className="form-control w-full max-w-xs">
             <div className="label">
