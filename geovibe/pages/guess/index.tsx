@@ -15,7 +15,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Guess() {
 
-    const [allPosts,setAllPosts] = useState(null);
+    const [allPosts,setAllPosts] = useState<any[] | null>(null);
     const [postIndex,setPostIndex] = useState(0);
     const [image,setImage] = useState('');
 
@@ -32,7 +32,7 @@ export default function Guess() {
 
     useEffect(() => {
         const retrieve = async () => {
-            const url = await getPublicPicUrl(allPosts[postIndex]['pic_uri']);
+            const url = await getPublicPicUrl(allPosts![postIndex]['pic_uri']);
             setImage(url);
         }
         if(allPosts) {
@@ -60,9 +60,9 @@ export default function Guess() {
                     {allPosts &&                     
                         <>
                         {image && 
-                                                <figure className="h-96">
-                                                <img src={image} alt="Italy"/>
-                                            </figure>
+                            <figure className="h-96">
+                                <img src={image} alt="Italy"/>
+                            </figure>
                         }
 
                         <h1 className="text-3xl">
@@ -80,7 +80,7 @@ export default function Guess() {
                     
                     <div className="join mt-3">
                         <button  onClick={() => setPostIndex(postIndex-1)} disabled={postIndex ==0} className="join-item btn btn-outline">Prev</button>
-                        <button  onClick={() => {setPostIndex(postIndex+1)}} disabled={postIndex == allPosts?.length - 1}className="join-item btn btn-outline">Next</button>
+                        <button  onClick={() => {setPostIndex(postIndex+1)}} disabled={postIndex == allPosts?.length! - 1}className="join-item btn btn-outline">Next</button>
                     </div>
                 </div>
                 <div className="col-span-3">
