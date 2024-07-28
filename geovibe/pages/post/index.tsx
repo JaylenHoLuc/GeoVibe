@@ -11,6 +11,8 @@ import EXIF from 'exif-js';
 import * as ExifReader from 'exifreader';
 import { Buffer } from 'buffer';
 import  createSupabaseClient  from "@/lib/supabaseclient";
+import Point from "@arcgis/core/geometry/Point";
+import Graphic from "@arcgis/core/Graphic";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +28,8 @@ export default function Post() {
     const [descr, setDescr] = useState("")
     const [guesses, setguesses] = useState<string>("")
     const [dist, setdist] = useState<number>(0);
+    const [pointGraphic, setpg] = useState<Graphic | null>(null)
+    
     const fetchImageAndConvertToBuffer = async (url : any) => {
       try {
           const response = await fetch(url);
@@ -117,13 +121,13 @@ export default function Post() {
       // return data["publicUrl"]
 
 
-      // const res = await supabase
-      //     .storage
-      //     .from('user-images')
-      //     .upload('abird/'+ curr_filename, curr_filename, {
-      //       cacheControl: '3600',
-      //       upsert: false
-      //     })
+      const res = await supabase
+          .storage
+          .from('user-images')
+          .upload('abird/'+ curr_filename, curr_filename, {
+            cacheControl: '3600',
+            upsert: false
+          })
           
       // const converted_to_miles = 
       // console.log("resp: ", res)
@@ -138,11 +142,11 @@ export default function Post() {
     //     category : currentCategory,
     //     distance : dist
     //   })
-    // const data =  await supabase.from('Users').insert({
+    // const data_user =  await supabase.from('Users').insert({
     //     username : "testnane11",
     //     name : "haha"
     // })
-      //console.log("user test: ", res)
+    console.log("user test: ", res)
 
 
     }
@@ -169,13 +173,34 @@ export default function Post() {
         return
     }
 
+
+
     const objectUrl = URL.createObjectURL(selectedFile)
     console.log("pic url : ",objectUrl);
     setimageUploaded(objectUrl);
 
     // // free memory when ever this component is unmounted
     // return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile])
+    const point = new Point({
+      longitude: longitude as number,
+      latitude: latitude as number
+  });
+  
+      const markerSymbol = {
+          type: "simple-marker", // Use a simple marker symbol
+          color: [226, 119, 40], // Set marker color
+          outline: {
+          color: [255, 255, 255], // Set outline color
+          width: 2
+          }
+      };
+      
+      setpg( new Graphic({
+          geometry: point,
+          symbol: markerSymbol
+      }));
+
+  }, [selectedFile,longitude, latitude])
   return (
     <div className="card bg-base-100 w-full mx-6 shadow-xl">
       <div className="card-body grid grid-cols-4">
@@ -248,7 +273,7 @@ export default function Post() {
           <div className="col-span-2 mt-6 mb-20">
             {
               imageUploaded && longitude && latitude &&
-              <EsriMap start_x={longitude as number} start_y={latitude as number}/>
+              <EsriMap start_x={longitude as number} start_y={latitude as number} point_ref={pointGraphic}/>
             }
           </div>
         </div>

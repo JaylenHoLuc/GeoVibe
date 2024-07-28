@@ -14,12 +14,11 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 
 
-const RenderMap = ({start_x, start_y} :{start_x : number, start_y : number}) => {
+const RenderMap = ({start_x, start_y, point_ref} :{start_x : number, start_y : number, point_ref: null | Graphic}) => {
     
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
     let graphicsLayer : GraphicsLayer | null = null;
     const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
-    
     const addPoint = (view :  MapView | null , x : number, y : number) => {
        
             const point = new Point({
@@ -95,7 +94,14 @@ const RenderMap = ({start_x, start_y} :{start_x : number, start_y : number}) => 
             graphicsLayerRef.current = graphicsLayer;
             map.add(graphicsLayer);
 
-
+            if (point_ref != null){
+                console.log("preset point : ",point_ref)
+                graphicsLayerRef.current!.add(point_ref);
+                setPointer(point_ref);
+                
+            }else{
+                console.log("is null")
+            }
 
             view.ui.add(expand, "top-right")
             view.on("click", function(event) {
