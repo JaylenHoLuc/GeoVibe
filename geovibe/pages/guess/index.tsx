@@ -264,7 +264,7 @@ export default function Guess() {
                     <div className="card bg-base-100">
                     {allPosts &&
                         <EsriMap user_x = {update_x} start_x={-118.80500} start_y={34.02700} post_x_coord= {allPosts[postIndex]['longitude']} 
-                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={3}/>
+                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={4}/>
                     }
 
                     <div className='mt-6 mx-6'>
