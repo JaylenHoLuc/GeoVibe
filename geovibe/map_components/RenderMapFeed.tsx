@@ -56,7 +56,7 @@ const RenderMapFeed = ({start_x, start_y, x_coords, y_coords, allPosts} :
                   type: "media",
                   title: realName,
                   activeMediaInfoIndex: 0,
-                  mediaInfos: [
+                  mediaInfos: 
                     {
                       // title: "<b>PIC TITLE<b>",
                       type: "image",
@@ -65,7 +65,7 @@ const RenderMapFeed = ({start_x, start_y, x_coords, y_coords, allPosts} :
                         sourceURL: publicPicUrl
                       }
                     }
-                  ]
+                  
                 }]
             }
             
