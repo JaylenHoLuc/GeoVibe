@@ -18,27 +18,31 @@ export default function Guess() {
     const [allPosts,setAllPosts] = useState<any[] | null>(null);
     const [postIndex,setPostIndex] = useState(0);
     const [image,setImage] = useState('');
-    const [dist_val, set_dist_val] = useState(0);
+    // const [dist_val, set_dist_val] = useState(0);
+    let dist_val = 0 ;
+    function set_dist_val (d : number) {
+        dist_val = d;
+    }
     const [current_guess_dist, setguessdist] = useState(0);
     const [post_x , set_x] = useState(0);
     const [post_y, set_y] = useState(0);
-    let c_x = 0;
+    let c_x : number | null= null;
     function set_cx (x : number) {
         c_x = x
     }
-    let c_y = 0;
+    let c_y : number | null= null;
     function set_cy (y : number) {
         c_y = y
     }
     const [current_color, set_current_color ] = useState("error");
-    const color_lerp_map = [
-        "error",
-        "error",
-        "warning",
-        "info",
-        "success"
+    // const color_lerp_map = [
+    //     "error",
+    //     "error",
+    //     "warning",
+    //     "info",
+    //     "success"
 
-    ]
+    // ]
 
     function calculateDistanceInMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
         const R = 3958.8; // Radius of the Earth in miles
@@ -60,14 +64,28 @@ export default function Guess() {
     const detColor = (dist_val : number) => {
         let hav_dist = null;
         if (c_x && c_y){
-            //calculateDistance(post_x,post_y, )
+            hav_dist = calculateDistanceInMiles(post_x,post_y, c_x, c_y)
+            console.log("hav dist : ", hav_dist)
         }
 
         if (current_guess_dist && dist_val && hav_dist ){
-
-        }else{
-            return "error";
+            const diff_dist = hav_dist - current_guess_dist;
+            if (current_guess_dist > hav_dist){
+                set_dist_val(100)
+                document.getElementById("slider")?.setAttribute("value", "100")
+                return "range range-success"
+            }else if (diff_dist <  current_guess_dist * .35 + current_guess_dist){
+                set_dist_val(75)
+                document.getElementById("slider")?.setAttribute("value", "75")
+                return "range range-info"
+            }else if (diff_dist <  current_guess_dist * .7 + current_guess_dist){
+                document.getElementById("slider")?.setAttribute("value", "25")
+                set_dist_val(25)
+                return "range range-warning"
+            }
         }
+        set_dist_val(0);
+        return "range range-error"
     }
     const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
 
@@ -91,7 +109,9 @@ export default function Guess() {
             retrieve();
             setguessdist(allPosts[postIndex]['distance']);
             set_x(allPosts[postIndex]['longitude']);
+            console.log(post_x)
             set_y(allPosts[postIndex]['latitude']);
+            console.log(post_y)
         }
     }, [allPosts, postIndex])
 
@@ -137,7 +157,7 @@ export default function Guess() {
                         </div>
                         </>
                     }
-                    {current_guess_dist && <input type="range" min={0} max="100" value={dist_val} className={`range range-${detColor(current_guess_dist)}`} step="25" />}
+                    {current_guess_dist && <input value={dist_val} id="slider" type="range" min={0} max="100" className={detColor(current_guess_dist)} step="25" />}
                     <div className="flex w-full justify-between px-2 text-xs">
                         <span>|</span>
                         <span>|</span>
