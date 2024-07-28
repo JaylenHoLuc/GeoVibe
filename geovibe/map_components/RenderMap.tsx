@@ -116,11 +116,11 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
                     const y = mapPoint.latitude;
                     addPoint(view, x, y);
                     guesses_remain = guesses_remain! - 1
-                    view!.openPopup({
-                        // Set the popup's title to the coordinates of the clicked location
-                        title: "Reverse geocode",
-                        location: event.mapPoint // Set the location of the popup to the clicked location
-                      });
+                    // view!.openPopup({
+                    //     // Set the popup's title to the coordinates of the clicked location
+                    //     title: "Reverse geocode",
+                    //     location: event.mapPoint // Set the location of the popup to the clicked location
+                    //   });
                     if (user_x){
                         user_x(x,y);
 
