@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-
+import image from '@/fixtures/2.png'
 
 const Navbar = () => {
     const [currentPage, setCurrentPage] = useState("");
@@ -32,7 +32,7 @@ const Navbar = () => {
         <>
         <div className="navbar bg-base-100">
             <div className="navbar-start">
-                <a className="btn btn-ghost text-xl">GeoVibe</a>
+              <img src={image.src} className='h-10 mr-6'/>
                 <ul className="menu menu-horizontal px-1">
                     <li><Link className={currentPage === 'guess' ? 'active' : ''} href="/guess">Guess</Link></li>
                     <li><Link className={currentPage === 'post' ? 'active' : ''} href="/post">Post</Link></li>

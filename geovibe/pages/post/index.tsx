@@ -13,6 +13,7 @@ import { Buffer } from 'buffer';
 import  createSupabaseClient  from "@/lib/supabaseclient";
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
+import { toast } from 'react-toastify'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -109,6 +110,7 @@ export default function Post() {
     }
 
     const pushToDatabase = async () => {
+
       const supabase = createSupabaseClient();
       console.log("descr : ", descr);
       console.log("guesses : ", guesses);
@@ -144,7 +146,12 @@ export default function Post() {
         distance : dist
       })
       console.log(data);
+      toast.success("Post Uploaded!")
+      setSelectedFile(null)
+      setDescr(null)
+      setguesses(0)
     }
+
 
     const saveCategory = (category : string) => {
         setCurrentCategory(category);
