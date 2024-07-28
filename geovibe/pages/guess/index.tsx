@@ -6,7 +6,7 @@ import RenderMap from "@/map_components/RenderMap";
 import dynamic from "next/dynamic";
 import Navbar from "@/navbar_components/navbar";
 import italy_photo from '@/fixtures/italy_photo.jpeg'
-import getAllPosts from "@/lib/SupabaseHelper";
+import {getAllPosts} from "@/lib/SupabaseHelper";
 import { useRef, useState } from "react";
 import createSupabaseClient from "@/lib/supabaseclient";
 import { useEffect, useCallback } from 'react';
