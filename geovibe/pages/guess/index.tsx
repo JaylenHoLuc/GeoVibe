@@ -12,17 +12,14 @@ import createSupabaseClient from "@/lib/supabaseclient";
 import { useEffect, useCallback } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
-
+const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
 export default function Guess() {
 
     const [allPosts,setAllPosts] = useState<any[] | null>(null);
     const [postIndex,setPostIndex] = useState(0);
     const [image,setImage] = useState('');
-    //const [dist_val, set_dist_val] = useState(0);
-    const dist_val = useRef(0);
-    const set_dist_val = (n : number) => {
-        dist_val.current = n
-    }
+    const [dist_val, set_dist_val] = useState(0);
+    
     const [current_guess_dist, setguessdist] = useState(0);
 
     const [post_x , set_x] = useState(0);
@@ -30,22 +27,66 @@ export default function Guess() {
     const [post_y, set_y] = useState(0);
     // const [c_x, set_cx] = useState(0);
 
-    // const [c_y, set_cy] = useState(0);
-
+    //const [guesses_remaind, set_gr] = useState<number>(0);
+    const guesses_remaind = useRef(0)
+    const dec = () => {
+        if (guesses_remaind){
+            console.log("GUESSES : ", guesses_remaind)
+            guesses_remaind.current--;
+        }
+    }
     //const [current_color, set_current_color ] = useState("range range-error");
     const current_color = useRef("range range-error")
     const set_current_color = (c : string) => {
         current_color.current = c
     }
     const c_x = useRef(0)
-    const update_x = useCallback((x : number) => {
-        c_x.current = x
-    }, [])
     const c_y = useRef(0)
-    const update_y = useCallback((y : number) => {
+
+    const detColor = useCallback(() => {
+        dec();
+        console.log("detcolor : ", c_x.current, c_y.current, post_x, post_y)
+        let hav_dist = null;
+        if (c_x.current && c_y.current){
+            hav_dist = calculateDistanceInMiles(c_y.current, c_x.current, post_y,post_x)
+            console.log("hav dist : ", hav_dist)
+        }
+
+        if (current_guess_dist  && hav_dist ){
+            const diff_dist = hav_dist;
+            let res = logToRange(diff_dist)
+            if (res > 45){
+                //set_dist_val(100)
+                set_current_color("range range-success")
+            }else if (30 <  res){
+
+                //set_dist_val(75)
+                set_current_color("range range-info")
+            }else if (15 <  res){
+                //set_dist_val(25)
+                set_current_color( "range range-warning")
+            }else {
+                //set_dist_val(0)
+                set_current_color( "range range-error")
+            }
+            console.log("diff dist : ", diff_dist)
+            
+            console.log("log res : ", res)
+            set_dist_val(res)
+            
+        }else {
+            set_dist_val(0);
+            set_current_color("range range-error");
+        }
+    },[current_guess_dist, post_x, post_y, dist_val, guesses_remaind])
+    const update_x = useCallback((x : number, y : number) => {
+        c_x.current = x
         c_y.current = y
-        detColor();
-    }, [])
+        if(post_x && post_y) {
+            detColor()
+        }
+    }, [detColor, post_x, post_y])
+
     // const color_lerp_map = [
     //     "error",
     //     "error",
@@ -54,29 +95,23 @@ export default function Guess() {
     //     "success"
 
     // ]
-    function logToRange(value: number): number {
-        if (value < 1 || value > 1000000) {
-          throw new Error("Value must be between 1 and 10000");
+    function logToRange(distance: number, maxDistance: number = 12500, base: number = 10): number {
+        // Ensure distance does not exceed max_distance
+        if (distance > maxDistance) {
+            distance = maxDistance;
         }
-      
-        // Take the base-10 logarithm
-        const logValue = Math.log10(value);
-      
-        // Normalize the log value to a range between 1 and 100
-        // The logarithm of 1 is 0, and the logarithm of 10000 is 4 (since log10(10000) = 4)
-        // We need to map the range [0, 4] to [1, 100]
-      
-        // Scaling factor to map the range
-        const minLog = 0; // log10(1)
-        const maxLog = 4; // log10(10000)
-        const minRange = 1;
-        const maxRange = 100;
-      
-        // Linear mapping
-        const normalizedValue = ((logValue - minLog) / (maxLog - minLog)) * (maxRange - minRange) + minRange;
-      
-        return normalizedValue;
-      }
+     
+        // Apply logarithmic scaling
+        const scaledDistance = Math.log(distance + 1) / Math.log(base);  // +1 to avoid log(0)
+        const maxScaledDistance = Math.log(maxDistance + 1) / Math.log(base);
+     
+        // Normalize the scaled distance to a value between 0 and 1
+        const normalized = scaledDistance / maxScaledDistance;
+     
+        // Map to slider range (0 to 100)
+        const sliderValue = (1 - normalized) * 100;
+        return sliderValue;
+    }
        
 
     function calculateDistanceInMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -96,33 +131,8 @@ export default function Guess() {
         return R * c; // Distance in miles
     }
 
-    const detColor = () => {
-        console.log("detcolor : ", c_x.current, c_y.current)
-        let hav_dist = null;
-        if (c_x.current && c_y.current){
-            hav_dist = calculateDistanceInMiles(c_y.current, c_x.current, post_y,post_x)
-            console.log("hav dist : ", hav_dist)
-        }
-
-        if (current_guess_dist  && hav_dist ){
-            const diff_dist = hav_dist - current_guess_dist;
-            if (current_guess_dist > hav_dist){
-                
-                set_current_color("range range-success")
-            }else if (diff_dist <  current_guess_dist * .35 + current_guess_dist){
-
-                
-                set_current_color("range range-info")
-            }else if (diff_dist <  current_guess_dist * .7 + current_guess_dist){
-                
-                set_current_color( "range range-warning")
-            }
-            set_dist_val(1 - logToRange(hav_dist))
-        }
-        // set_dist_val(0);
-         set_current_color("range range-error")
-    }
-    const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
+    
+    
 
     async function getPublicPicUrl(filename: string) {
         // const k = await supabase.from('Users').insert({ username: "testname", name: "John DOe" })
@@ -133,8 +143,8 @@ export default function Guess() {
     }
     useEffect(() => {
         console.log(c_y.current, c_x.current)
-
-    }, [c_y.current, c_x.current])
+   
+    }, [c_y.current, c_x.current, dist_val, post_x, post_y])
 
     useEffect(() => {
         const retrieve = async () => {
@@ -148,8 +158,9 @@ export default function Guess() {
             console.log(post_x)
             set_y(allPosts[postIndex]['latitude']);
             console.log(post_y)
+            guesses_remaind.current = (allPosts![postIndex]['guesses_max'])
         }
-    }, [allPosts, postIndex])
+    }, [allPosts, postIndex, guesses_remaind])
 
     useEffect(() => {
         const retrieve = async () => {
@@ -182,7 +193,7 @@ export default function Guess() {
                         <div className="stats shadow">
                         <div className="stat">
                             <div className="stat-title">Guesses Remaining</div>
-                            <div className="stat-value place-self-center">{allPosts[postIndex]['guesses_max']? allPosts[postIndex]['guesses_max'] : 3 }</div>
+                            <div className="stat-value place-self-center">{guesses_remaind.current}</div>
                         </div>
                         </div>
                         <div className="stats shadow">
@@ -193,7 +204,7 @@ export default function Guess() {
                         </div>
                         </>
                     }
-                    {current_guess_dist && <input value={dist_val.current} id="slider" type="range" min={0} max="100" className={current_color.current} step="25" />}
+                    {current_guess_dist && <input value={dist_val} id="slider" type="range" min={0} max="70" className={current_color.current} step="1" />}
                     <div className="flex w-full justify-between px-2 text-xs">
                         <span>|</span>
                         <span>|</span>
@@ -211,8 +222,8 @@ export default function Guess() {
                 <div className="col-span-3">
                     <div className="card bg-base-100">
                     {allPosts &&
-                        <EsriMap user_x = {update_x} user_y = {update_y}start_x={-118.80500} start_y={34.02700} post_x_coord= {allPosts[postIndex]['longitude']} 
-                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={allPosts![postIndex]['guesses_max']? allPosts![postIndex]['guesses_max'] : 3 }/>
+                        <EsriMap user_x = {update_x} start_x={-118.80500} start_y={34.02700} post_x_coord= {allPosts[postIndex]['longitude']} 
+                        post_y_coord={allPosts[postIndex]['latitude']} point_ref={null} total_guesses={guesses_remaind.current? guesses_remaind.current : 3 }/>
                     }
                     </div>
                 </div>

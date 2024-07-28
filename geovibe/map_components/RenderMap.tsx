@@ -14,8 +14,8 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 import Popup from "@arcgis/core/widgets/Popup.js";
 
-const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, post_y_coord, user_x, user_y} :
-    {start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null, post_x_coord : number | null, post_y_coord : number | null, user_x : Function | null, user_y : Function | null}) => {
+const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, post_y_coord, user_x} :
+    {start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null, post_x_coord : number | null, post_y_coord : number | null, user_x : Function | null}) => {
     console.log("post lat : ",post_y_coord)
     console.log("post long : ",post_x_coord)
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
@@ -100,7 +100,7 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
             graphicsLayerRef.current = graphicsLayer;
             map.add(graphicsLayer);
             console.log("tot guess : ",total_guesses);
-            if (total_guesses != null && guesses_remain && guesses_remain > 0){
+            if (guesses_remain != null && guesses_remain > 0 ){
                 console.log("curr guesses : ",guesses_remain)
                 if (point_ref != null){
                     console.log("preset point : ",point_ref)
@@ -121,9 +121,8 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
                         title: "Reverse geocode",
                         location: event.mapPoint // Set the location of the popup to the clicked location
                       });
-                    if (user_x && user_y){
-                        user_x(x);
-                        user_y(y);
+                    if (user_x){
+                        user_x(x,y);
 
                     }
 
