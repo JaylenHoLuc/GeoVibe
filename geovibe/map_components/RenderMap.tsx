@@ -14,11 +14,13 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 
 
-const RenderMap = ({start_x, start_y, point_ref} :{start_x : number, start_y : number, point_ref: null | Graphic}) => {
+const RenderMap = ({start_x, start_y, point_ref, total_guesses} :{start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null}) => {
     
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
+    let guesses_remain = total_guesses;
     let graphicsLayer : GraphicsLayer | null = null;
     const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
+    let clickHandler: IHandle | null = null;
     const addPoint = (view :  MapView | null , x : number, y : number) => {
        
             const point = new Point({
@@ -84,33 +86,40 @@ const RenderMap = ({start_x, start_y, point_ref} :{start_x : number, start_y : n
                 }
                 
             });
-            const postWidget =  document.getElementById("post-wrap")!;
-            const expand = new Expand({
-                content: postWidget,
-                expanded: false
-            })
 
             graphicsLayer = new GraphicsLayer();
             graphicsLayerRef.current = graphicsLayer;
             map.add(graphicsLayer);
+            console.log("tot guess : ",total_guesses);
+            if (total_guesses != null && guesses_remain && guesses_remain > 0){
+                console.log("curr guesses : ",guesses_remain)
+                if (point_ref != null){
+                    console.log("preset point : ",point_ref)
+                    graphicsLayerRef.current!.add(point_ref);
+                    setPointer(point_ref);
+                    
+                }
 
-            if (point_ref != null){
-                console.log("preset point : ",point_ref)
-                graphicsLayerRef.current!.add(point_ref);
-                setPointer(point_ref);
-                
-            }
-
-            view.ui.add(expand, "top-right")
-            view.on("click", function(event) {
-                // Get the coordinates of the clicked point
-                const mapPoint = event.mapPoint;
-                const x = mapPoint.longitude;
-                const y = mapPoint.latitude;
-                console.log("currentpointer: ", currentPointer)
-                addPoint(view, x, y);
-                console.log("Clicked coordinates:", x, y);
-                });
+                clickHandler = view.on("click", function(event) {
+                    // Get the coordinates of the clicked point
+                    const mapPoint = event.mapPoint;
+                    const x = mapPoint.longitude;
+                    const y = mapPoint.latitude;
+                    addPoint(view, x, y);
+                    guesses_remain = guesses_remain! - 1
+                    
+                    if (guesses_remain == 0){
+                        // console.log("u lose");
+                        // console.log("removed");
+                        clickHandler?.remove();
+                        clickHandler = null;
+                        guesses_remain = null;
+                    }
+                    console.log("Clicked coordinates:", x, y);
+                    });
+                }
+  
+               
             }   
         initMap();     
       return () => {

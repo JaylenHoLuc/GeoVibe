@@ -85,7 +85,9 @@ export default function Guess() {
                 </div>
                 <div className="col-span-3">
                     <div className="card bg-base-100">
-                    <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null}/>
+                    {allPosts &&
+                        <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null} total_guesses={allPosts![postIndex]['guesses_max']? allPosts![postIndex]['guesses_max'] : 3 }/>
+                    }
                     </div>
                 </div>
             </div>

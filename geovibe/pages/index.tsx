@@ -13,7 +13,7 @@ export default function Home() {
   const EsriMap = dynamic(() => import("@/map_components/RenderMap"), { ssr: false });
   return (
     <>
-        <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null}/>
+        <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null} total_guesses={null}/>
     </>
   );
 }
