@@ -6,16 +6,16 @@ import Extent from '@arcgis/core/geometry/Extent'
 import { watch } from '@arcgis/core/core/reactiveUtils'
 import Map from '@arcgis/core/Map';
 import Expand from '@arcgis/core/widgets/Expand'
-import { useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import styles from './styles.module.css'
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils.js";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
+import Popup from "@arcgis/core/widgets/Popup.js";
 
-
-const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, post_y_coord} :
-    {start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null, post_x_coord : number | null, post_y_coord : number | null}) => {
+const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, post_y_coord, user_x, user_y} :
+    {start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null, post_x_coord : number | null, post_y_coord : number | null, user_x : Function | null, user_y : Function | null}) => {
     console.log("post lat : ",post_y_coord)
     console.log("post long : ",post_x_coord)
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
@@ -23,6 +23,12 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
     let graphicsLayer : GraphicsLayer | null = null;
     const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
     let clickHandler: IHandle | null = null;
+
+    const guessAttempt = () => {
+
+    }
+
+
     const addPoint = (view :  MapView | null , x : number, y : number) => {
        
             const point = new Point({
@@ -88,6 +94,7 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
                 }
                 
             });
+            view.popupEnabled = false;
 
             graphicsLayer = new GraphicsLayer();
             graphicsLayerRef.current = graphicsLayer;
@@ -109,7 +116,17 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
                     const y = mapPoint.latitude;
                     addPoint(view, x, y);
                     guesses_remain = guesses_remain! - 1
-                    
+                    view!.openPopup({
+                        // Set the popup's title to the coordinates of the clicked location
+                        title: "Reverse geocode",
+                        location: event.mapPoint // Set the location of the popup to the clicked location
+                      });
+                    if (user_x && user_y){
+                        user_x(x);
+                        user_y(y);
+
+                    }
+
                     if (guesses_remain == 0){
                         console.log("u lose");
                         clickHandler?.remove();
@@ -134,8 +151,9 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, po
   
     return (
 
-        <div ref={mapRef} id={styles.mapContainer} style={{ width: '100%', height: '400px' }}></div>
-
+            <div>
+                <div ref={mapRef} id={styles.mapContainer} style={{ width: '100%', height: '400px' }}></div>
+            </div>
 
     );
 }

@@ -271,7 +271,7 @@ export default function Post() {
           <div className="col-span-2 mt-6 mb-20">
             {
               imageUploaded && longitude && latitude &&
-              <EsriMap start_x={longitude as number} post_x_coord = {null} post_y_coord={null} start_y={latitude as number} point_ref={pointGraphic} total_guesses={null}/>
+              <EsriMap user_x={null} user_y={null} start_x={longitude as number} post_x_coord = {null} post_y_coord={null} start_y={latitude as number} point_ref={pointGraphic} total_guesses={null}/>
             }
           </div>
         </div>
