@@ -14,8 +14,10 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 
 
-const RenderMap = ({start_x, start_y, point_ref, total_guesses} :{start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null}) => {
-    
+const RenderMap = ({start_x, start_y, point_ref, total_guesses, post_x_coord, post_y_coord} :
+    {start_x : number, start_y : number, point_ref: null | Graphic, total_guesses : number | null, post_x_coord : number | null, post_y_coord : number | null}) => {
+    console.log("post lat : ",post_y_coord)
+    console.log("post long : ",post_x_coord)
     const [currentPointer, setPointer] = useState<Graphic | null>(null);
     let guesses_remain = total_guesses;
     let graphicsLayer : GraphicsLayer | null = null;
@@ -77,7 +79,7 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses} :{start_x : numb
             });
 
             view = new MapView({
-                container: mapRef.current!,
+                container: styles.mapContainer,
                 map: map,
                 center: [start_x, start_y],
                 zoom: 3,
@@ -109,8 +111,7 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses} :{start_x : numb
                     guesses_remain = guesses_remain! - 1
                     
                     if (guesses_remain == 0){
-                        // console.log("u lose");
-                        // console.log("removed");
+                        console.log("u lose");
                         clickHandler?.remove();
                         clickHandler = null;
                         guesses_remain = null;
@@ -129,7 +130,7 @@ const RenderMap = ({start_x, start_y, point_ref, total_guesses} :{start_x : numb
         }
       };
       
-    }, []);
+    }, [mapRef]);
   
     return (
 
