@@ -52,21 +52,15 @@ const RenderMapFeed = ({start_x, start_y, x_coords, y_coords, allPosts} :
                 title: post.created_by,
                 caption: "CAPTION",
                 // content: "<p>" + post.description + "</p><img src='https://rajxtaeiecyqefngyhgw.supabase.co/storage/v1/object/public/user-images/abird/Australia.JPG'/>"
-                content: [{
-                  type: "media",
-                  title: realName,
-                  activeMediaInfoIndex: 0,
-                  mediaInfos: 
-                    {
-                      // title: "<b>PIC TITLE<b>",
-                      type: "image",
-                      caption: post.description,
-                      value: {
-                        sourceURL: publicPicUrl
-                      }
-                    }
-                  
-                }]
+                content: function () {
+                  return `
+                    <div>
+                      <h3>${realName}</h3>
+                      <p>${post.description}</p>
+                      <img height='300' width='250' src="${publicPicUrl}" alt="${post.description}" />
+                    </div>
+                  `;
+                }
             }
             
             const pointGraphic = new Graphic({

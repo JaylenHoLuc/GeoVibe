@@ -6,7 +6,7 @@ import RenderMapFeed from "@/map_components/RenderMapFeed";
 import dynamic from "next/dynamic";
 import Navbar from "@/navbar_components/navbar";
 import { useEffect, useState } from "react";
-import { getAllPosts, getAllPostsUnlimited } from "@/lib/SupabaseHelper";
+import { getAllPosts, getAllPostsUnlimited, getAllPostsGuessed } from "@/lib/SupabaseHelper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +21,7 @@ export default function Feed() {
 
     useEffect(() => {
         const fetchPosts = async () => {
-        const allPosts = await getAllPostsUnlimited();
+        const allPosts = await getAllPostsGuessed();
         const ys = allPosts?.map(post => post.latitude);
         const xs = allPosts?.map(post => post.longitude);
         setXs(xs);
