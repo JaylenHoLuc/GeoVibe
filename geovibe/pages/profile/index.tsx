@@ -36,7 +36,7 @@ export default function Profile() {
               </div>
             </div>
             <div className="col-span-4">
-              <EsriMap />
+              <EsriMap start_x={-118.80500} start_y={34.02700} point_ref={null}/>
             </div>
           </div>
         </div>
