@@ -143,7 +143,7 @@ export default function Post() {
         pic_uri : "annam/" + curr_filename,
         guesses_max : parseInt(guesses),
         category : currentCategory,
-        distance : dist
+        distance : 5
       })
       console.log(data);
       toast.success("Post Uploaded!")
